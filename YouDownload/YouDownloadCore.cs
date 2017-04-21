@@ -1,0 +1,65 @@
+﻿using MediaToolkit;
+using MediaToolkit.Model;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using VideoLibrary;
+using System;
+
+namespace YouDownload
+{
+    public class YouDownloadCore
+    {
+        private ProgressBar progressBar1 { get; set; }
+        private ProgressBar progressBar2 { get; set; }
+        private int songNumber;
+        private int convertedSong;
+
+        public void DonwloadMP3(string[] links, string destPath, ProgressBar pbr1, ProgressBar pbr2)
+        {
+            songNumber = links.Length;
+            this.progressBar1 = pbr1;
+            this.progressBar2 = pbr2;
+            if (links.Length==0)
+                throw new Exception("Il file txt è vuoto");
+            if (!Directory.Exists(destPath))
+                throw new DirectoryNotFoundException("Il path di destinazione non esiste");
+            YouTube youtube = YouTube.Default;
+            convertedSong = 0;
+            progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Maximum = 100 * links.Length; });
+            foreach (string link in links)
+            {
+                YouTubeVideo audio = youtube.GetAllVideos(link).Where(e => e.AudioFormat == AudioFormat.Aac && e.AdaptiveKind == AdaptiveKind.Audio).ToList().FirstOrDefault();
+                string filename = Path.ChangeExtension(Path.Combine(destPath, Path.GetFileNameWithoutExtension(audio.FullName)), "mp3");
+                MediaFile inputFile = new MediaFile { Filename = audio.GetUri()};
+                MediaFile outputFile = new MediaFile { Filename = filename };
+                using (Engine engine = new Engine())
+                {
+
+                    engine.GetMetadata(inputFile);
+                    if (this.progressBar1 != null)
+                    {
+                        engine.ConvertProgressEvent += engine_ConvertProgressEvent;
+                        engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                    }
+                    engine.Convert(inputFile, outputFile);
+                }
+            }
+        }
+
+        private void engine_ConversionCompleteEvent(object sender, ConversionCompleteEventArgs e)
+        {
+            progressBar1.Invoke((MethodInvoker)delegate () { progressBar1.Value = 100; });
+        }
+
+        private void engine_ConvertProgressEvent(object sender, ConvertProgressEventArgs e)
+        {   
+            if ((convertedSong * 100 + (int)((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100)) < progressBar2.Value)
+            {
+                convertedSong++;
+            }
+            progressBar1.Invoke((MethodInvoker)delegate () { progressBar1.Value = (int) ((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100); });
+            progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Value = (convertedSong * 100 + (int)((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100)); });
+        }
+    }
+}
