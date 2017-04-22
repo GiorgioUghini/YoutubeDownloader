@@ -34,7 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtPath = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
-            this.pbrConvert = new System.Windows.Forms.ProgressBar();
+            this.pbrConvert = new YouDownload.ProgressBarSample.CustomProgressBar();
             this.label3 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -42,7 +42,7 @@
             this.btnAbout = new System.Windows.Forms.Button();
             this.checkSinglevideo = new System.Windows.Forms.CheckBox();
             this.checkPlaylistvideo = new System.Windows.Forms.CheckBox();
-            this.pbrTotal = new System.Windows.Forms.ProgressBar();
+            this.pbrTotal = new YouDownload.ProgressBarSample.CustomProgressBar();
             this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -101,6 +101,8 @@
             // 
             // pbrConvert
             // 
+            this.pbrConvert.CustomText = null;
+            this.pbrConvert.DisplayStyle = YouDownload.ProgressBarSample.ProgressBarDisplayText.Percentage;
             this.pbrConvert.Location = new System.Drawing.Point(115, 192);
             this.pbrConvert.Name = "pbrConvert";
             this.pbrConvert.Size = new System.Drawing.Size(577, 23);
@@ -229,7 +231,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtPath;
         private System.Windows.Forms.Button btnBrowse;
-        private System.Windows.Forms.ProgressBar pbrConvert;
+        private YouDownload.ProgressBarSample.CustomProgressBar pbrConvert;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label4;
@@ -237,7 +239,7 @@
         private System.Windows.Forms.Button btnAbout;
         private System.Windows.Forms.CheckBox checkSinglevideo;
         private System.Windows.Forms.CheckBox checkPlaylistvideo;
-        private System.Windows.Forms.ProgressBar pbrTotal;
+        private YouDownload.ProgressBarSample.CustomProgressBar pbrTotal;
         private System.Windows.Forms.Label label5;
     }
 }

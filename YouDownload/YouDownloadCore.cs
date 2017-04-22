@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using VideoLibrary;
 using System;
+using System.Drawing;
 
 namespace YouDownload
 {
@@ -12,20 +13,23 @@ namespace YouDownload
     {
         private ProgressBar progressBar1 { get; set; }
         private ProgressBar progressBar2 { get; set; }
+        private Button btnDownload { get; set; }
         private int songNumber;
         private int convertedSong;
 
-        public void DonwloadMP3(string[] links, string destPath, ProgressBar pbr1, ProgressBar pbr2)
+        public void DonwloadMP3(string[] links, string destPath, ProgressBar[] pbr, Button btnDown)
         {
             songNumber = links.Length;
-            this.progressBar1 = pbr1;
-            this.progressBar2 = pbr2;
+            progressBar1 = pbr[0];
+            progressBar2 = pbr[1];
+            btnDownload = btnDown;
             if (links.Length==0)
                 throw new Exception("Il file txt è vuoto");
             if (!Directory.Exists(destPath))
                 throw new DirectoryNotFoundException("Il path di destinazione non esiste");
             YouTube youtube = YouTube.Default;
             convertedSong = 0;
+            btnDownload.Invoke((MethodInvoker)delegate () { btnDownload.Enabled=false; });
             progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Maximum = 100 * links.Length; });
             foreach (string link in links)
             {
@@ -58,7 +62,10 @@ namespace YouDownload
             {
                 convertedSong++;
             }
-            progressBar1.Invoke((MethodInvoker)delegate () { progressBar1.Value = (int) ((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100); });
+            progressBar1.Invoke((MethodInvoker)delegate () 
+            {
+                progressBar1.Value = (int) ((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100);
+            });
             progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Value = (convertedSong * 100 + (int)((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100)); });
         }
     }
