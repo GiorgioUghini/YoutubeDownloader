@@ -5,7 +5,8 @@ using System.Linq;
 using System.Windows.Forms;
 using VideoLibrary;
 using System;
-using System.Drawing;
+using System.Collections.Generic;
+using YouTubePlaylistAPI;
 
 namespace YouDownload
 {
@@ -67,6 +68,21 @@ namespace YouDownload
                 progressBar1.Value = (int) ((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100);
             });
             progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Value = (convertedSong * 100 + (int)((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100)); });
+        }
+        
+        public void downloadPlaylist(string playlistID, string destPath, ProgressBar[] pbr, Button btnDown)
+        {
+            YouTubeServiceClient ytc = new YouTubeServiceClient();
+            string[] playlistURL = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
+            List<IYouTubeSong> songlist = new List<IYouTubeSong>();
+            songlist = ytc.GetPlayListSongs("giorgio.gioba@gmail.com", playlistURL[1]);
+            var listOfStrings = new List<string>();
+            foreach (IYouTubeSong canzone in songlist)
+            {
+                listOfStrings.Add("https://www.youtube.com/watch?v=" + canzone.SongId);
+            }
+            string[] youtubesongs = listOfStrings.ToArray();
+            DonwloadMP3(youtubesongs, destPath, pbr, btnDown);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using YouDownload.ProgressBarSample;
 
 namespace YouDownload
 {
@@ -115,8 +114,16 @@ namespace YouDownload
                 ProgressBar[] pbr = { pbrConvert, pbrTotal };
                 if (checkPlaylistvideo.Checked)
                 {
-                    string[] elements = System.IO.File.ReadAllLines(textBox1.Text);
-                    youDownload.DonwloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                    if (textBox1.Text.EndsWith(".txt"))
+                    {
+                        string[] elements = System.IO.File.ReadAllLines(textBox1.Text);
+                        youDownload.DonwloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                    }
+                    else
+                    {
+                        youDownload.downloadPlaylist(textBox1.Text, txtPath.Text, pbr, btnDownload);
+                    }
+                    
                 }
                 else
                 {

@@ -127,11 +127,11 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(50, 104);
+            this.label4.Location = new System.Drawing.Point(18, 104);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(59, 13);
+            this.label4.Size = new System.Drawing.Size(91, 13);
             this.label4.TabIndex = 10;
-            this.label4.Text = "Playlist .txt:";
+            this.label4.Text = "Playlist (.txt o YT):";
             // 
             // btnBrowseFile
             // 
@@ -172,14 +172,16 @@
             this.checkPlaylistvideo.AutoSize = true;
             this.checkPlaylistvideo.Location = new System.Drawing.Point(543, 159);
             this.checkPlaylistvideo.Name = "checkPlaylistvideo";
-            this.checkPlaylistvideo.Size = new System.Drawing.Size(113, 17);
+            this.checkPlaylistvideo.Size = new System.Drawing.Size(96, 17);
             this.checkPlaylistvideo.TabIndex = 14;
-            this.checkPlaylistvideo.Text = "Scarica playlist .txt";
+            this.checkPlaylistvideo.Text = "Scarica playlist";
             this.checkPlaylistvideo.UseVisualStyleBackColor = true;
             this.checkPlaylistvideo.CheckedChanged += new System.EventHandler(this.checkPlaylistvideo_CheckedChanged);
             // 
             // pbrTotal
             // 
+            this.pbrTotal.CustomText = null;
+            this.pbrTotal.DisplayStyle = YouDownload.ProgressBarSample.ProgressBarDisplayText.Percentage;
             this.pbrTotal.Location = new System.Drawing.Point(115, 226);
             this.pbrTotal.Name = "pbrTotal";
             this.pbrTotal.Size = new System.Drawing.Size(577, 23);
@@ -199,7 +201,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(743, 262);
+            this.ClientSize = new System.Drawing.Size(743, 268);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.pbrTotal);
             this.Controls.Add(this.checkPlaylistvideo);
