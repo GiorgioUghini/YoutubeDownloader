@@ -18,7 +18,7 @@ namespace YouDownload
         private int songNumber;
         private int convertedSong;
 
-        public void DonwloadMP3(string[] links, string destPath, ProgressBar[] pbr, Button btnDown)
+        public void DownloadMP3(string[] links, string destPath, ProgressBar[] pbr, Button btnDown)
         {
             songNumber = links.Length;
             progressBar1 = pbr[0];
@@ -82,7 +82,7 @@ namespace YouDownload
                 listOfStrings.Add("https://www.youtube.com/watch?v=" + canzone.SongId);
             }
             string[] youtubesongs = listOfStrings.ToArray();
-            DonwloadMP3(youtubesongs, destPath, pbr, btnDown);
+            DownloadMP3(youtubesongs, destPath, pbr, btnDown);
         }
     }
 }

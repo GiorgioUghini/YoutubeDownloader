@@ -117,7 +117,7 @@ namespace YouDownload
                     if (textBox1.Text.EndsWith(".txt"))
                     {
                         string[] elements = System.IO.File.ReadAllLines(textBox1.Text);
-                        youDownload.DonwloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                        youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
                     }
                     else
                     {
@@ -128,7 +128,7 @@ namespace YouDownload
                 else
                 {
                     string[] elements = { txtUrl.Text };
-                    youDownload.DonwloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                    youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
                 }
             }
             catch (Exception ex)
