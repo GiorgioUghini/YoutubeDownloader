@@ -75,7 +75,7 @@ namespace YouDownload
             YouTubeServiceClient ytc = new YouTubeServiceClient();
             string[] playlistURL = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
             List<IYouTubeSong> songlist = new List<IYouTubeSong>();
-            songlist = ytc.GetPlayListSongs("giorgio.gioba@gmail.com", playlistURL[1]);
+            songlist = ytc.GetPlayListSongs(playlistURL[1]);
             var listOfStrings = new List<string>();
             foreach (IYouTubeSong canzone in songlist)
             {
