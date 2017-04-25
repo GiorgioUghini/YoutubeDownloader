@@ -5,8 +5,9 @@ using System.Linq;
 using System.Windows.Forms;
 using VideoLibrary;
 using System;
-using System.Collections.Generic;
-using YouTubePlaylistAPI;
+using System.Net;
+using System.Web;
+using System.Web.Script.Serialization;
 
 namespace YouDownload
 {
@@ -72,17 +73,36 @@ namespace YouDownload
         
         public void downloadPlaylist(string playlistID, string destPath, ProgressBar[] pbr, Button btnDown)
         {
-            YouTubeServiceClient ytc = new YouTubeServiceClient();
-            string[] playlistURL = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
-            List<IYouTubeSong> songlist = new List<IYouTubeSong>();
-            songlist = ytc.GetPlayListSongs(playlistURL[1]);
-            var listOfStrings = new List<string>();
-            foreach (IYouTubeSong canzone in songlist)
+            string[] playlistURLs = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
+            YTResponse ytResponse = null;
+            string url = @"https://www.googleapis.com/youtube/v3/playlistItems";
+            var uriBuilder = new UriBuilder(url);
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            query["part"] = "contentDetails";
+            query["maxResults"] = "50";
+            query["playlistId"] = playlistURLs[1];
+            query["key"] = "AIzaSyCtzP23AG4P_K5WNIjqb7AOFnhWNyLIkoE";
+            while (ytResponse == null || !string.IsNullOrWhiteSpace(ytResponse.nextPageToken))
             {
-                listOfStrings.Add("https://www.youtube.com/watch?v=" + canzone.SongId);
+                if (ytResponse != null && !string.IsNullOrWhiteSpace(ytResponse.nextPageToken))
+                    query["pageToken"] = ytResponse.nextPageToken;
+                uriBuilder.Query = query.ToString();
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uriBuilder.ToString());
+                request.AutomaticDecompression = DecompressionMethods.GZip;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    ytResponse = new JavaScriptSerializer().Deserialize<YTResponse>(reader.ReadToEnd());
+                }
+                string textResponse = string.Join(Environment.NewLine, ytResponse.items.Select(x => x.contentDetails.videoId).ToArray());
+                string[] youtubesongs = textResponse.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                for (int i=0;i<youtubesongs.Length;i++)
+                {
+                    youtubesongs[i] = "https://www.youtube.com/watch?v=" + youtubesongs[i];
+                }
+                DownloadMP3(youtubesongs, destPath, pbr, btnDown);
             }
-            string[] youtubesongs = listOfStrings.ToArray();
-            DownloadMP3(youtubesongs, destPath, pbr, btnDown);
         }
     }
 }
