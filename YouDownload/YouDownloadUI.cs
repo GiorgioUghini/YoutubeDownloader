@@ -74,6 +74,7 @@ namespace YouDownload
 
     public partial class YouDownloadUI : Form
     {
+        public ReturnError errori = new ReturnError();
         private static readonly YouDownloadCore youDownload = new YouDownloadCore();
         private BackgroundWorker bkgWorker = null;
 
@@ -102,6 +103,16 @@ namespace YouDownload
 
         private void bkgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            pbrTotal.Maximum = 100;
+            pbrTotal.Value = 100;
+            if (errori.errorNumber!=0)
+            {
+                MessageBox.Show(String.Concat("Canzoni non scaricate: ",errori.errorNumber.ToString(),"\n\nE' possibile trovare la lista di canzoni non scaricate nella cartella della musica"), "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                foreach (string link in errori.errorLinks)
+                {
+                    System.IO.File.AppendAllText(String.Concat(txtPath.Text,@"\Errori.txt"), link+"\n");
+                }
+            }
             MessageBox.Show("Operazione terminata", "Informazione", MessageBoxButtons.OK, MessageBoxIcon.Information);
             btnDownload.Enabled = true;
         }
@@ -117,18 +128,18 @@ namespace YouDownload
                     if (textBox1.Text.EndsWith(".txt"))
                     {
                         string[] elements = System.IO.File.ReadAllLines(textBox1.Text);
-                        youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                        errori = youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
                     }
                     else
                     {
-                        youDownload.downloadPlaylist(textBox1.Text, txtPath.Text, pbr, btnDownload);
+                        errori = youDownload.downloadPlaylist(textBox1.Text, txtPath.Text, pbr, btnDownload);
                     }
                     
                 }
                 else
                 {
                     string[] elements = { txtUrl.Text };
-                    youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
+                    errori = youDownload.DownloadMP3(elements, txtPath.Text, pbr, btnDownload);
                 }
             }
             catch (Exception ex)

@@ -8,6 +8,7 @@ using System;
 using System.Net;
 using System.Web;
 using System.Web.Script.Serialization;
+using System.Collections.Generic;
 
 namespace YouDownload
 {
@@ -19,7 +20,7 @@ namespace YouDownload
         private int songNumber;
         private int convertedSong;
 
-        public void DownloadMP3(string[] links, string destPath, ProgressBar[] pbr, Button btnDown)
+        public ReturnError DownloadMP3(string[] links, string destPath, ProgressBar[] pbr, Button btnDown)
         {
             songNumber = links.Length;
             progressBar1 = pbr[0];
@@ -33,24 +34,37 @@ namespace YouDownload
             convertedSong = 0;
             btnDownload.Invoke((MethodInvoker)delegate () { btnDownload.Enabled=false; });
             progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Maximum = 100 * links.Length; });
+            ReturnError results = new ReturnError();
+            results.errorNumber = 0;
+            results.errorLinks = new List<string>();
             foreach (string link in links)
             {
-                YouTubeVideo audio = youtube.GetAllVideos(link).Where(e => e.AudioFormat == AudioFormat.Aac && e.AdaptiveKind == AdaptiveKind.Audio).ToList().FirstOrDefault();
-                string filename = Path.ChangeExtension(Path.Combine(destPath, Path.GetFileNameWithoutExtension(audio.FullName)), "mp3");
-                MediaFile inputFile = new MediaFile { Filename = audio.GetUri()};
-                MediaFile outputFile = new MediaFile { Filename = filename };
-                using (Engine engine = new Engine())
+                try
                 {
+                    YouTubeVideo audio = youtube.GetAllVideos(link).Where(e => e.AudioFormat == AudioFormat.Aac && e.AdaptiveKind == AdaptiveKind.Audio).ToList().FirstOrDefault();
+                    string filename = Path.ChangeExtension(Path.Combine(destPath, Path.GetFileNameWithoutExtension(audio.FullName)), "mp3");
+                    MediaFile inputFile = new MediaFile { Filename = audio.GetUri()};
+                    MediaFile outputFile = new MediaFile { Filename = filename };
 
-                    engine.GetMetadata(inputFile);
-                    if (this.progressBar1 != null)
+                    using (Engine engine = new Engine())
                     {
-                        engine.ConvertProgressEvent += engine_ConvertProgressEvent;
-                        engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+
+                        engine.GetMetadata(inputFile);
+                        if (this.progressBar1 != null)
+                        {
+                            engine.ConvertProgressEvent += engine_ConvertProgressEvent;
+                            engine.ConversionCompleteEvent += engine_ConversionCompleteEvent;
+                        }
+                        engine.Convert(inputFile, outputFile);
                     }
-                    engine.Convert(inputFile, outputFile);
+                }
+                catch (NullReferenceException e)
+                {
+                    results.errorNumber++;
+                    results.errorLinks.Add(link);
                 }
             }
+            return results;
         }
 
         private void engine_ConversionCompleteEvent(object sender, ConversionCompleteEventArgs e)
@@ -71,9 +85,11 @@ namespace YouDownload
             progressBar2.Invoke((MethodInvoker)delegate () { progressBar2.Value = (convertedSong * 100 + (int)((e.ProcessedDuration.TotalSeconds / e.TotalDuration.TotalSeconds) * 100)); });
         }
         
-        public void downloadPlaylist(string playlistID, string destPath, ProgressBar[] pbr, Button btnDown)
+        public ReturnError downloadPlaylist(string playlistID, string destPath, ProgressBar[] pbr, Button btnDown)
         {
             string[] playlistURLs = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
+            ReturnError errors = new ReturnError();
+            btnDownload.Invoke((MethodInvoker)delegate () { btnDownload.Enabled = false; });
             YTResponse ytResponse = null;
             string url = @"https://www.googleapis.com/youtube/v3/playlistItems";
             var uriBuilder = new UriBuilder(url);
@@ -101,8 +117,9 @@ namespace YouDownload
                 {
                     youtubesongs[i] = "https://www.youtube.com/watch?v=" + youtubesongs[i];
                 }
-                DownloadMP3(youtubesongs, destPath, pbr, btnDown);
+                errors = DownloadMP3(youtubesongs, destPath, pbr, btnDown);
             }
+            return errors;
         }
     }
 }

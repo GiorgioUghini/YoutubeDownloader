@@ -198,11 +198,7 @@
         /// <param name="e">    Event information to send to registered event handlers. </param>
         private void OnProgressChanged(ConvertProgressEventArgs e)
         {
-            EventHandler<ConvertProgressEventArgs> handler = this.ConvertProgressEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            ConvertProgressEvent?.Invoke(this, e);
         }
 
         /// -------------------------------------------------------------------------------------------------
