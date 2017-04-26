@@ -87,9 +87,12 @@ namespace YouDownload
         
         public ReturnError downloadPlaylist(string playlistID, string destPath, ProgressBar[] pbr, Button btnDown)
         {
+            List<string> partLinks = new List<string>();
+            List<string> totalLinks = new List<string>();
+            List<string> tmpLinks = new List<string>();
             string[] playlistURLs = playlistID.Split(new string[] { "list=" }, StringSplitOptions.None);
-            ReturnError errors = new ReturnError();
-            btnDownload.Invoke((MethodInvoker)delegate () { btnDownload.Enabled = false; });
+            ReturnError errorRes = new ReturnError();
+            btnDown.Invoke((MethodInvoker)delegate () { btnDown.Enabled = false; });
             YTResponse ytResponse = null;
             string url = @"https://www.googleapis.com/youtube/v3/playlistItems";
             var uriBuilder = new UriBuilder(url);
@@ -112,14 +115,20 @@ namespace YouDownload
                     ytResponse = new JavaScriptSerializer().Deserialize<YTResponse>(reader.ReadToEnd());
                 }
                 string textResponse = string.Join(Environment.NewLine, ytResponse.items.Select(x => x.contentDetails.videoId).ToArray());
-                string[] youtubesongs = textResponse.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-                for (int i=0;i<youtubesongs.Length;i++)
-                {
-                    youtubesongs[i] = "https://www.youtube.com/watch?v=" + youtubesongs[i];
-                }
-                errors = DownloadMP3(youtubesongs, destPath, pbr, btnDown);
+                partLinks.Add(textResponse);
             }
-            return errors;
+            foreach (string response in partLinks)
+            {
+                tmpLinks = response.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+                totalLinks = totalLinks.Concat(tmpLinks).ToList();
+            }
+            string[] youtubesongs = totalLinks.ToArray();
+            for (int i = 0; i < youtubesongs.Length; i++)
+            {
+                youtubesongs[i] = "https://www.youtube.com/watch?v=" + youtubesongs[i];
+            }
+            errorRes = DownloadMP3(youtubesongs, destPath, pbr, btnDown);
+            return errorRes;
         }
     }
 }
