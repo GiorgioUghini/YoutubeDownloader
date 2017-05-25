@@ -105,6 +105,10 @@ namespace YouDownload
         {
             pbrTotal.Maximum = 100;
             pbrTotal.Value = 100;
+            if (e.Error != null)
+            {
+                MessageBox.Show(e.Error.ToString());    //DEBUG OPTION
+            }
             if (errori.errorNumber!=0)
             {
                 MessageBox.Show(String.Concat("Canzoni non scaricate: ",errori.errorNumber.ToString(),"\n\nE' possibile trovare la lista di canzoni non scaricate nella cartella della musica"), "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
